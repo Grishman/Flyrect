@@ -3,7 +3,6 @@ package com.sm.tamplate;
 import android.content.Context;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -12,6 +11,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 	public DrawView(Context context) {
 		super(context);
 		getHolder().addCallback(this);
+
 	}
 
 	@Override
