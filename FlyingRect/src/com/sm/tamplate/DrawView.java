@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -13,6 +14,20 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 	private DrawThread drawThread;
 	Paint p;
 	Rect rect;
+	
+	/**
+     * Current height of the surface/canvas.
+     * 
+     * @see #setSurfaceSize
+     */
+    private int mCanvasHeight = 1;
+
+    /**
+     * Current width of the surface/canvas.
+     * 
+     * @see #setSurfaceSize
+     */
+    private int mCanvasWidth = 1;
 
 	public DrawView(Context context) {
 		super(context);
@@ -33,9 +48,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		drawThread = new DrawThread(getHolder());
-		drawThread.setRunning(true);
-		drawThread.start();
+		drawThread.setSurfaceSize(width, height);
 
 	}
 
@@ -57,11 +70,26 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 
 		private boolean running = false;
 		private SurfaceHolder surfaceHolder;
-
+		long prevTime;
 		public DrawThread(SurfaceHolder surfaceHolder) {
 			this.surfaceHolder = surfaceHolder;
+			 // сохран€ем текущее врем€
+	        prevTime = System.currentTimeMillis();
+			rect.set(250, 300, 350, 400);
 
 		}
+
+		public void setSurfaceSize(int width, int height) {
+            // synchronized to make sure these all change atomically
+            synchronized (surfaceHolder) {
+            	mCanvasWidth = width;
+                mCanvasHeight = height;
+                Log.i("SurfSize", "Surf Change "+mCanvasWidth+" high "+mCanvasHeight);
+                // don't forget to resize the background image
+                //mBackgroundImage = mBackgroundImage.createScaledBitmap(
+                //        mBackgroundImage, width, height, true);
+            }
+        }
 
 		public void setRunning(boolean running) {
 			this.running = running;
@@ -79,19 +107,19 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 			p.setStyle(Paint.Style.STROKE);
 			// настройка объекта Rect;
 			// лева€ верхн€€ точка (250,300), нижн€€ права€ (350,500)
-			rect.set(250, 300, 350, 400);
+
 			canvas.drawRect(rect, p);
 
 		}
 
 		// ќбновл€ет позиции
 		// TODO Implement method
-		private void updatePhysics(Canvas canvas) {
+		private void updatePhysics() {
 			int dx = 15;
 			int dy = 15;
 			
 			rect.offset(dx, dy);
-			canvas.drawRect(rect, p);
+			//canvas.drawRect(rect, p);
 		}
 
 		@Override
@@ -99,6 +127,15 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 			Canvas canvas;
 
 			while (running) {
+				
+				long now = System.currentTimeMillis();
+	            long elapsedTime = now - prevTime;
+	            if (elapsedTime > 1000){
+	            	 prevTime = now;
+	            	//updatePhysics();
+	            	 rect.offset(-10, -10);
+	            	 
+	            }
 				canvas = null;
 				try {
 					canvas = surfaceHolder.lockCanvas(null);
@@ -107,7 +144,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 					// TODO implement update() and draw()
 
 					doDraw(canvas);
-					updatePhysics(canvas);
+					//updatePhysics(canvas);
 					
 				} finally {
 					if (canvas != null) {
