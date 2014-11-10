@@ -14,6 +14,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 	private DrawThread drawThread;
 	Paint p;
 	Rect rect;
+	Rect canvasRect;
 	
 	/**
      * Current height of the surface/canvas.
@@ -34,6 +35,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 		getHolder().addCallback(this);
 		p = new Paint();
 		rect = new Rect();
+		canvasRect = new Rect();
 
 	}
 
@@ -64,6 +66,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 
+
 	}
 
 	class DrawThread extends Thread {
@@ -76,7 +79,8 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 			 // сохраняем текущее время
 	        prevTime = System.currentTimeMillis();
 			rect.set(250, 300, 350, 400);
-
+			canvasRect.set(0, 0, mCanvasWidth, mCanvasHeight);
+			
 		}
 
 		public void setSurfaceSize(int width, int height) {
@@ -85,6 +89,7 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
             	mCanvasWidth = width;
                 mCanvasHeight = height;
                 Log.i("SurfSize", "Surf Change "+mCanvasWidth+" high "+mCanvasHeight);
+                
                 // don't forget to resize the background image
                 //mBackgroundImage = mBackgroundImage.createScaledBitmap(
                 //        mBackgroundImage, width, height, true);
@@ -118,7 +123,11 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 			int dx = 15;
 			int dy = 15;
 			
-			rect.offset(dx, dy);
+			rect.offset(dx, dy); 
+//			if (rect.intersects(rect, canvasRect)) {
+//				Log.v("coll", "its workiing");
+//				
+//			}
 			//canvas.drawRect(rect, p);
 		}
 
@@ -142,8 +151,9 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 					if (canvas == null)
 						continue;
 					// TODO implement update() and draw()
-
+					canvas.drawRect(canvasRect, p);
 					doDraw(canvas);
+
 					//updatePhysics(canvas);
 					
 				} finally {
@@ -165,6 +175,22 @@ public class DrawView extends SurfaceView implements SurfaceHolder.Callback {
 		// synchronized (mSurfaceHolder) {
 		// if (mMode == STATE_RUNNING) setState(STATE_PAUSE);
 		// }
+	}
+
+	public int getmCanvasHeight() {
+		return mCanvasHeight;
+	}
+
+	public void setmCanvasHeight(int mCanvasHeight) {
+		this.mCanvasHeight = mCanvasHeight;
+	}
+
+	public int getmCanvasWidth() {
+		return mCanvasWidth;
+	}
+
+	public void setmCanvasWidth(int mCanvasWidth) {
+		this.mCanvasWidth = mCanvasWidth;
 	}
 
 }
