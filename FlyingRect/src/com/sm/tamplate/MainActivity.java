@@ -3,6 +3,7 @@ package com.sm.tamplate;
 import android.app.Activity;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 
 public class MainActivity extends Activity {
@@ -13,6 +14,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getSize();
+		Log.i("test", "WWW "+width+"HHH "+height);
 		rectView.setmCanvasHeight(height);
 		rectView.setmCanvasWidth(width);
 		setContentView(new DrawView(this));
